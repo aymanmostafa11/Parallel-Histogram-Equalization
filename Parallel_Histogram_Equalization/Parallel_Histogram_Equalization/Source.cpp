@@ -10,6 +10,7 @@
 
 
 #include "utility.h"
+#include "imageUtility.h"
 #include "SequentialEqualization.h"
 
 

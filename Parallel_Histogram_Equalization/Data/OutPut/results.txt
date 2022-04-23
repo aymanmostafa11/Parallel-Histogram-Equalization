@@ -17,3 +17,4 @@ Size: (200 , 195) , Time : 35ms
 Size: (200 , 195) , Time : 35ms
 Size: (200 , 195) , Time : 46ms
 Size: (200 , 195) , Time : 41ms
+Size: (200 , 195) , Time : 38ms
