@@ -13,22 +13,22 @@ int* makeFrequancyArray(int* image, int pixelsNumber)
 	return frequancyArray;
 }
 
-double* calculatePixelProbability(int* frequancyArray, int pixelCount)
+double* calculateColorProbability(int* frequancyArray, int pixelCount)
 {
-	double* pixelProbability = new double[MAX_COLOR_VALUE] {};
+	double* colorProbability = new double[MAX_COLOR_VALUE] {};
 	for (int i = 0; i < MAX_COLOR_VALUE; i++)
 	{
-		pixelProbability[i] = (double)frequancyArray[i] / pixelCount;
+		colorProbability[i] = (double)frequancyArray[i] / pixelCount;
 	}
-	return pixelProbability;
+	return colorProbability;
 }
-double* calculateCumulativeProbability(double* pixelProbability)
+double* calculateCumulativeProbability(double* colorProbability)
 {
 	double* cumulativeProbability = new double[MAX_COLOR_VALUE] {};
-	cumulativeProbability[0] = pixelProbability[0];
+	cumulativeProbability[0] = colorProbability[0];
 	for (int i = 1; i < MAX_COLOR_VALUE; i++)
 	{
-		cumulativeProbability[i] = pixelProbability[i] + cumulativeProbability[i - 1];
+		cumulativeProbability[i] = colorProbability[i] + cumulativeProbability[i - 1];
 	}
 	return cumulativeProbability;
 }
@@ -52,28 +52,29 @@ int* equalizeImage(int* image, int* intenisties, int pixelCount)
 	return image;
 }
 
-int* sequentialEqualization(int* image, int width, int height)
+int* sequentialEqualization(int* image, int width, int height, int intenistyRange)
 {
 	int pixelCount = width * height;
+
 	int* frequancyArray = makeFrequancyArray(image, pixelCount);
 
-	double* pixelProbability = calculatePixelProbability(frequancyArray, pixelCount);
-	double* cumulativeProbability = calculateCumulativeProbability(pixelProbability);
+	double* colorProbability = calculateColorProbability(frequancyArray, pixelCount);
+	double* cumulativeProbability = calculateCumulativeProbability(colorProbability);
 
-	int* equalizedIntenisties = putInRange(cumulativeProbability, 240);
+	int* equalizedIntenisties = putInRange(cumulativeProbability, intenistyRange);
 
 	int* finalImage = equalizeImage(image, equalizedIntenisties, pixelCount);
-
+	verifyFinalImage(finalImage, pixelCount);
 	return finalImage;
 }
 
-void sequentialRunAndClock(int* image, int width, int height, int imageIndex)
+void sequentialRunAndClock(int* image, int width, int height, int imageIndex, int intenistyRange)
 {
 	int start_s, stop_s, TotalTime = 0;
 
 	start_s = clock();
 
-	image = sequentialEqualization(image, width, height);
+	image = sequentialEqualization(image, width, height, intenistyRange);
 
 	createImage(image, width, height, imageIndex);
 
