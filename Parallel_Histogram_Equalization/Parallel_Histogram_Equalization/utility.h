@@ -9,7 +9,7 @@ using namespace std;
 #define TEST_5N "..//Data//Input//5Nx5N.png"
 #define TEST_10N "..//Data//Input//10Nx10N.png"
 
-#define MAX_COLOR_VALUE 256
+#define MAX_INTENSITY_VALUE 256
 
 
 string TEST_PATH;
@@ -66,13 +66,15 @@ bool isMainProcessor(int rank)
 
 void verifyFrequancyArray(int* frequancy)
 {
+	cout << "Verifying Frequancy Array: \n\n";
+
 	ifstream file("..//Data//Input//frequancy.txt");
-	int expected[MAX_COLOR_VALUE];
-	for (int i = 0; i < MAX_COLOR_VALUE; i++)
+	int expected[MAX_INTENSITY_VALUE];
+	for (int i = 0; i < MAX_INTENSITY_VALUE; i++)
 		file >> expected[i];
 	file.close();
 
-	for (int i = 0; i < MAX_COLOR_VALUE; i++)
+	for (int i = 0; i < MAX_INTENSITY_VALUE; i++)
 	{
 		if (frequancy[i] != expected[i])
 		{
@@ -83,17 +85,21 @@ void verifyFrequancyArray(int* frequancy)
 			exit(-1);
 		}
 	}
+	cout << "Verified!\n\n";
+
 }
 
 void verifyColorProbability(double* colorProbability)
 {
+	cout << "Verifying Color Probability: \n\n";
+
 	ifstream file("..//Data//Input//colorProbability.txt");
-	double expected[MAX_COLOR_VALUE];
-	for (int i = 0; i < MAX_COLOR_VALUE; i++)
+	double expected[MAX_INTENSITY_VALUE];
+	for (int i = 0; i < MAX_INTENSITY_VALUE; i++)
 		file >> expected[i];
 	file.close();
 
-	for (int i = 0; i < MAX_COLOR_VALUE; i++)
+	for (int i = 0; i < MAX_INTENSITY_VALUE; i++)
 	{
 		if (abs(colorProbability[i] - expected[i]) > 0.0001)
 		{
@@ -104,17 +110,21 @@ void verifyColorProbability(double* colorProbability)
 			exit(-1);
 		}
 	}
+	cout << "Verfied!\n\n";
+
 }
 
 void verifyCumulativeProbability(double* cumulativeProbability)
 {
+	cout << "Verifying Cumulative Probability: \n\n";
+
 	ifstream file("..//Data//Input//cumulativeProbability.txt");
-	double expected[MAX_COLOR_VALUE];
-	for (int i = 0; i < MAX_COLOR_VALUE; i++)
+	double expected[MAX_INTENSITY_VALUE];
+	for (int i = 0; i < MAX_INTENSITY_VALUE; i++)
 		file >> expected[i];
 	file.close();
 
-	for (int i = 0; i < MAX_COLOR_VALUE; i++)
+	for (int i = 0; i < MAX_INTENSITY_VALUE; i++)
 	{
 		if (abs(cumulativeProbability[i] - expected[i]) > 0.0001)
 		{
@@ -125,17 +135,21 @@ void verifyCumulativeProbability(double* cumulativeProbability)
 			exit(-1);
 		}
 	}
+	cout << "Verfied!\n\n";
+
 }
 
 void verifyEqualizedIntenisties(int* equalizedIntenisties)
 {
+	cout << "Verifying Equalized Intenisties: \n\n";
+
 	ifstream file("..//Data//Input//equalizedIntenisties.txt");
-	double expected[MAX_COLOR_VALUE];
-	for (int i = 0; i < MAX_COLOR_VALUE; i++)
+	double expected[MAX_INTENSITY_VALUE];
+	for (int i = 0; i < MAX_INTENSITY_VALUE; i++)
 		file >> expected[i];
 	file.close();
 
-	for (int i = 0; i < MAX_COLOR_VALUE; i++)
+	for (int i = 0; i < MAX_INTENSITY_VALUE; i++)
 	{
 		if (abs(equalizedIntenisties[i] - expected[i]) > 0.0001)
 		{
@@ -146,10 +160,14 @@ void verifyEqualizedIntenisties(int* equalizedIntenisties)
 			exit(-1);
 		}
 	}
+	cout << "Verfied!\n\n";
+
 }
 
-void verifyFinalImage(int* finalImage,int pixelCount)
+void verifyFinalImage(int* finalImage, int pixelCount)
 {
+	cout << "Verifying Final Image: \n\n";
+
 	ifstream file("..//Data//Input//finalImage.txt");
 	int* expected = new int[pixelCount];
 	for (int i = 0; i < pixelCount; i++)
@@ -167,6 +185,8 @@ void verifyFinalImage(int* finalImage,int pixelCount)
 			exit(-1);
 		}
 	}
+
+	cout << "Verfied!\n\n";
 }
 
 // Not ready as a function yet

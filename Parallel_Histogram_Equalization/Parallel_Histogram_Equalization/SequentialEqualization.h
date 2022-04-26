@@ -1,10 +1,10 @@
 #pragma once
 #include "utility.h"
-#define MAX_COLOR_VALUE 256
+#define MAX_INTENSITY_VALUE 256
 
 int* makeFrequancyArray(int* image, int pixelsNumber)
 {
-	int* frequancyArray = new int[MAX_COLOR_VALUE] {};
+	int* frequancyArray = new int[MAX_INTENSITY_VALUE] {};
 
 	for (int i = 0; i < pixelsNumber; i++)
 	{
@@ -15,8 +15,8 @@ int* makeFrequancyArray(int* image, int pixelsNumber)
 
 double* calculateColorProbability(int* frequancyArray, int pixelCount)
 {
-	double* colorProbability = new double[MAX_COLOR_VALUE] {};
-	for (int i = 0; i < MAX_COLOR_VALUE; i++)
+	double* colorProbability = new double[MAX_INTENSITY_VALUE] {};
+	for (int i = 0; i < MAX_INTENSITY_VALUE; i++)
 	{
 		colorProbability[i] = (double)frequancyArray[i] / pixelCount;
 	}
@@ -24,9 +24,9 @@ double* calculateColorProbability(int* frequancyArray, int pixelCount)
 }
 double* calculateCumulativeProbability(double* colorProbability)
 {
-	double* cumulativeProbability = new double[MAX_COLOR_VALUE] {};
+	double* cumulativeProbability = new double[MAX_INTENSITY_VALUE] {};
 	cumulativeProbability[0] = colorProbability[0];
-	for (int i = 1; i < MAX_COLOR_VALUE; i++)
+	for (int i = 1; i < MAX_INTENSITY_VALUE; i++)
 	{
 		cumulativeProbability[i] = colorProbability[i] + cumulativeProbability[i - 1];
 	}
@@ -35,13 +35,26 @@ double* calculateCumulativeProbability(double* colorProbability)
 
 int* putInRange(double* cumulativeProbability, int range)
 {
-	int* equalizedIntenisties = new int[MAX_COLOR_VALUE] {};
-	for (int i = 1; i < MAX_COLOR_VALUE; i++)
+	int* equalizedIntenisties = new int[MAX_INTENSITY_VALUE] {};
+	for (int i = 1; i < MAX_INTENSITY_VALUE; i++)
 	{
 		equalizedIntenisties[i] = floor(cumulativeProbability[i] * range);
 	}
 	return equalizedIntenisties;
 }
+
+int* putInRangeV(double* cumulativeProbability, int range, int NUMBER_OF_INTENSITY_VALUES)
+{
+	int* equalizedIntenisties = new int[NUMBER_OF_INTENSITY_VALUES] {};
+	for (int i = 0; i < NUMBER_OF_INTENSITY_VALUES; i++)
+	{
+		equalizedIntenisties[i] = floor(cumulativeProbability[i] * range);
+	}
+	return equalizedIntenisties;
+
+}
+
+
 
 int* equalizeImage(int* image, int* intenisties, int pixelCount)
 {
