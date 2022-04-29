@@ -33,6 +33,17 @@ double* calculateCumulativeProbability(double* colorProbability)
 	return cumulativeProbability;
 }
 
+double* calculateCumulativeProbability(double* colorProbability, int size)
+{
+	double* cumulativeProbability = new double[size] {};
+	cumulativeProbability[0] = colorProbability[0];
+	for (int i = 1; i < size; i++)
+	{
+		cumulativeProbability[i] = colorProbability[i] + cumulativeProbability[i - 1];
+	}
+	return cumulativeProbability;
+}
+
 int* putInRange(double* cumulativeProbability, int range)
 {
 	int* equalizedIntenisties = new int[MAX_INTENSITY_VALUE] {};

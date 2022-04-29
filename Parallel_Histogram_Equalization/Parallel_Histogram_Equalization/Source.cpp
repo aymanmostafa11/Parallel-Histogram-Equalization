@@ -102,6 +102,40 @@ int main()
 		verifyFrequancyArray(totalFrequancyArray);
 #pragma endregion
 
+#pragma region Cumulative Probability
+
+	double* cumulativeProbability = new double[MAX_INTENSITY_VALUE];
+	double* colorProbability = {};
+
+	if (isMainProcessor(rank))
+	{
+		colorProbability = calculateColorProbability(totalFrequancyArray, PIXELS_COUNT);
+	}
+
+	double* localColorProbability = new double[INTENSITIES_PER_PROCESSOR];
+
+
+	MPI_Scatter(colorProbability, INTENSITIES_PER_PROCESSOR, MPI_DOUBLE, localColorProbability, INTENSITIES_PER_PROCESSOR,
+		MPI_DOUBLE, MAIN_PROCESSOR, MPI_COMM_WORLD);
+
+	double *localCumulativeProbability = calculateCumulativeProbability(localColorProbability, INTENSITIES_PER_PROCESSOR);
+
+	double prevSum = 0;
+	double cumulativeSum = localCumulativeProbability[INTENSITIES_PER_PROCESSOR - 1];
+
+	MPI_Exscan(&cumulativeSum, &prevSum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
+	for (int i = 0; i < INTENSITIES_PER_PROCESSOR; i++)localCumulativeProbability[i] += prevSum;
+
+	MPI_Gather(localCumulativeProbability, INTENSITIES_PER_PROCESSOR, MPI_DOUBLE, cumulativeProbability, INTENSITIES_PER_PROCESSOR,
+		MPI_DOUBLE, MAIN_PROCESSOR, MPI_COMM_WORLD);
+
+	if (isMainProcessor(rank) && ENABLE_DEBUG)
+		verifyCumulativeProbability(cumulativeProbability);
+
+
+#pragma endregion
+
 #pragma region Equalize Intensities 
 
 	// NOTE: currently doesn't work if number of processors is not a power of 2, shall be fixed soon (fr)
@@ -110,21 +144,8 @@ int main()
 	/* This is probably usesless beacuse the overhead of parallelizing an operatation that is applied only 256 times probably takes more
 	time than just doing it sequentially */
 
-	/* Temporarily done sequentially becuase i can't work without them */
-	double* cumulativeProbability = NULL;
-	if (isMainProcessor(rank))
-	{
-		double* colorProbability = calculateColorProbability(totalFrequancyArray, PIXELS_COUNT);
-		cumulativeProbability = calculateCumulativeProbability(colorProbability);
-	}
 
-	double* localCumulativeProbabilites = new double[INTENSITIES_PER_PROCESSOR] {};
-
-	MPI_Scatter(cumulativeProbability, INTENSITIES_PER_PROCESSOR, MPI_DOUBLE,
-		localCumulativeProbabilites, INTENSITIES_PER_PROCESSOR, MPI_DOUBLE, MAIN_PROCESSOR, MPI_COMM_WORLD);
-
-
-	int* localIntensities = putInRangeV(localCumulativeProbabilites, INTENSITY_RANGE, INTENSITIES_PER_PROCESSOR);
+	int* localIntensities = putInRangeV(localCumulativeProbability, INTENSITY_RANGE, INTENSITIES_PER_PROCESSOR);
 
 	int* totalIntensities = new int[MAX_INTENSITY_VALUE];
 	MPI_Gather(localIntensities, INTENSITIES_PER_PROCESSOR, MPI_INT,
@@ -150,5 +171,4 @@ void cleanUp(int* localFrequancyArray, int* localImage, int* imageData, int* tot
 	delete imageData;
 	delete totalFrequancyArray;
 }
-
 
