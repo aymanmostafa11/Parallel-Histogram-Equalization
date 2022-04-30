@@ -102,6 +102,46 @@ int main()
 		verifyFrequancyArray(totalFrequancyArray);
 #pragma endregion
 
+
+#pragma region calculate Color probability
+
+
+	double* localProbabilites = new double[INTENSITIES_PER_PROCESSOR] {};
+	int* localFrequencyArray;
+
+
+	if (WORLD_SIZE == 3) {
+		//will use scatterv cpu1=85,cpu2=85,cpu3=86
+		int count[3] = { 85,85, 86 };
+		int displacement[3] = { 0,85,170 };
+		MPI_Request request;
+		MPI_Iscatterv(totalFrequancyArray, count, displacement, MPI_INT,
+			localFrequancyArray, INTENSITIES_PER_PROCESSOR, MPI_DOUBLE, MAIN_PROCESSOR, MPI_COMM_WORLD, &request);
+		for (int i = 0; i < INTENSITIES_PER_PROCESSOR; i++)
+			localProbabilites[i] = (double)localFrequancyArray[i] / PIXELS_COUNT;
+		
+	}
+	else {
+
+
+		MPI_Scatter(totalFrequancyArray, INTENSITIES_PER_PROCESSOR, MPI_INT,
+			localFrequancyArray, INTENSITIES_PER_PROCESSOR, MPI_DOUBLE, MAIN_PROCESSOR, MPI_COMM_WORLD);
+
+		//localProbabilites = calculateColorProbability(localFrequancyArray, PIXELS_COUNT);
+		for (int i = 0; i < INTENSITIES_PER_PROCESSOR; i++)
+			localProbabilites[i] = (double)localFrequancyArray[i] / PIXELS_COUNT;
+		
+
+	}
+	double* totalCumulativeProbabilites = new double[MAX_INTENSITY_VALUE] {};
+
+	MPI_Gather(localProbabilites, INTENSITIES_PER_PROCESSOR, MPI_INT, totalCumulativeProbabilites,
+		INTENSITIES_PER_PROCESSOR, MPI_DOUBLE, MAIN_PROCESSOR, MPI_COMM_WORLD);
+
+
+#pragma endregion
+
+
 #pragma region Cumulative Probability
 
 	double* cumulativeProbability = new double[MAX_INTENSITY_VALUE];
