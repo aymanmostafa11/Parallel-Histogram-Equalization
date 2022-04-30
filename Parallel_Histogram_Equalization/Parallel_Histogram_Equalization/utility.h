@@ -58,6 +58,26 @@ bool isMainProcessor(int rank)
 	return rank == MAIN_PROCESSOR;
 }
 
+int* calculateDistributionCounts(int pixelsPerProcessor, int worldSize, int paddingSize)
+{
+	int* counts = new int[worldSize];
+	counts[0] = pixelsPerProcessor;
+	for (int i = 1; i < worldSize; i++)
+	{
+		counts[i] = pixelsPerProcessor - paddingSize;
+	}
+	return counts;
+}
+int* calculateDistributionDisplacements(int* counts, int pixelsPerProcessor, int worldSize, int paddingSize)
+{
+	int* displacement = new int[worldSize] {};
+	for (int i = 1; i < worldSize; i++)
+	{
+		displacement[i] = counts[i - 1] + displacement[i - 1];
+	}
+	return displacement;
+}
+
 
 /* Kindly note the test files have only been made for the NxN picture & 240 intenisty range*/
 #pragma region Testing Functions
@@ -80,9 +100,9 @@ void verifyFrequancyArray(int* frequancy)
 		{
 			cout << "Wrong Value at index " << i << "\nExpected : " << expected[i]
 				<< ", Got : " << frequancy[i] << "\n";
-			cout << "Exiting..!\n";
+			//cout << "Exiting..!\n";
 			system("pause");
-			exit(-1);
+			//exit(-1);
 		}
 	}
 	cout << "Verified!\n\n";

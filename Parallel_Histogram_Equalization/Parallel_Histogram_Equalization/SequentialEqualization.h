@@ -13,6 +13,18 @@ int* makeFrequancyArray(int* image, int pixelsNumber)
 	return frequancyArray;
 }
 
+/* This overload is made to account for non divisble pixels to processor counts*/
+int* makeFrequancyArray(int* image, int pixelsNumber, int paddingSize)
+{
+	int* frequancyArray = new int[MAX_INTENSITY_VALUE] {};
+
+	for (int i = 0; i < pixelsNumber - paddingSize; i++)
+	{
+		frequancyArray[image[i]]++;
+	}
+	return frequancyArray;
+}
+
 double* calculateColorProbability(int* frequancyArray, int pixelCount)
 {
 	double* colorProbability = new double[MAX_INTENSITY_VALUE] {};

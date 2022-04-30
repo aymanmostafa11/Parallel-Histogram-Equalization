@@ -28,7 +28,7 @@ using namespace msclr::interop;
 bool RUNNING_PARALLEL;
 
 
-#define ENABLE_DEBUG 2
+#define ENABLE_DEBUG 1
 // prints a message from each processor where x -> message (or expression in cout form eg. foo << bar)
 #define debug(x) if(ENABLE_DEBUG) cout << "Rank : " << rank << " " << x << "\n";
 
@@ -76,8 +76,12 @@ int main()
 	}
 
 
-	int PIXELS_PER_PROCESSOR = ceil(PIXELS_COUNT / WORLD_SIZE);
+	/*When using PIXELS_PER_PROCESSOR note that in case of non divisible pixels count 
+	the remainder is added to the PIXELS_PER_PROCESSOR but should only be processed by MAIN_PROCESSOR*/
+	int DIVISION_REMAINDER = (PIXELS_COUNT % WORLD_SIZE);
+	int PIXELS_PER_PROCESSOR = PIXELS_COUNT / WORLD_SIZE + DIVISION_REMAINDER;
 	MPI_Bcast(&PIXELS_PER_PROCESSOR, 1, MPI_INT, MAIN_PROCESSOR, MPI_COMM_WORLD);
+	MPI_Bcast(&DIVISION_REMAINDER, 1, MPI_INT, MAIN_PROCESSOR, MPI_COMM_WORLD);
 
 	int INTENSITIES_PER_PROCESSOR = ceil(MAX_INTENSITY_VALUE / WORLD_SIZE);
 	MPI_Bcast(&INTENSITIES_PER_PROCESSOR, 1, MPI_INT, MAIN_PROCESSOR, MPI_COMM_WORLD);
@@ -89,14 +93,25 @@ int main()
 
 
 #pragma region Frequancy Array
+	
+	int* counts = new int[WORLD_SIZE];
+	int* displacement = new int[WORLD_SIZE] {};
 
+	if (isMainProcessor(rank))
+	{
+		counts = calculateDistributionCounts(PIXELS_PER_PROCESSOR, WORLD_SIZE, DIVISION_REMAINDER);
+		displacement = calculateDistributionDisplacements(counts, PIXELS_PER_PROCESSOR, WORLD_SIZE, DIVISION_REMAINDER);
+	}
 	int* localImage = new int[PIXELS_PER_PROCESSOR] {};
 
-	MPI_Scatter(imageData, PIXELS_PER_PROCESSOR, MPI_INT, localImage, PIXELS_PER_PROCESSOR, MPI_INT, MAIN_PROCESSOR, MPI_COMM_WORLD);
+	MPI_Scatterv(imageData, counts, displacement, MPI_INT, localImage, PIXELS_PER_PROCESSOR, MPI_INT, MAIN_PROCESSOR, MPI_COMM_WORLD);
 	MPI_Barrier(MPI_COMM_WORLD);
 
 	int* localFrequancyArray;
-	localFrequancyArray = makeFrequancyArray(localImage, PIXELS_PER_PROCESSOR);
+	if (isMainProcessor(rank))
+		localFrequancyArray = makeFrequancyArray(localImage, PIXELS_PER_PROCESSOR, 0); 
+	else
+		localFrequancyArray = makeFrequancyArray(localImage, PIXELS_PER_PROCESSOR, DIVISION_REMAINDER);
 	MPI_Barrier(MPI_COMM_WORLD);
 
 	int* totalFrequancyArray = new int[MAX_INTENSITY_VALUE] {};
@@ -109,7 +124,7 @@ int main()
 
 #pragma region calculate Color probability
 
-
+	
 	double* localProbabilites = new double[INTENSITIES_PER_PROCESSOR] {};
 	int* localFrequencyArray;
 
