@@ -45,3 +45,15 @@ Size: (200 , 195) , Time : 108ms
 Size: (200 , 195) , Time : 75ms
 Size: (200 , 195) , Time : 82ms
 Size: (200 , 195) , Time : 390ms
+Size: (200 , 195) , Time : 129ms
+Size: (200 , 195) , Time : 231ms
+Size: (200 , 195) , Time : 165ms
+Size: (200 , 195) , Time : 123ms
+Size: (200 , 195) , Time : 126ms
+Size: (200 , 195) , Time : 4747ms
+Size: (200 , 195) , Time : 247ms
+Size: (200 , 195) , Time : 124ms
+Size: (200 , 195) , Time : 169ms
+Size: (200 , 195) , Time : 236ms
+Size: (720 , 720) , Time : 364ms
+Size: (720 , 720) , Time : 362ms

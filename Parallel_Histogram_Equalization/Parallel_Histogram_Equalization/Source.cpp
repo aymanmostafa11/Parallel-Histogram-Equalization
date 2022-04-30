@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include<string.h>
 #include<msclr\marshal_cppstd.h>
-#include <ctime>// include this header 
+#include <ctime> 
 #include <mpi.h>
 #include <stdio.h>
 #pragma once
@@ -82,6 +82,10 @@ int main()
 	int INTENSITIES_PER_PROCESSOR = ceil(MAX_INTENSITY_VALUE / WORLD_SIZE);
 	MPI_Bcast(&INTENSITIES_PER_PROCESSOR, 1, MPI_INT, MAIN_PROCESSOR, MPI_COMM_WORLD);
 
+	int PADDED_SUBARRAY_SIZE = ceil((float)MAX_INTENSITY_VALUE / WORLD_SIZE);
+	int PADDED_ARRAY_SIZE = PADDED_SUBARRAY_SIZE * WORLD_SIZE;
+
+
 
 
 #pragma region Frequancy Array
@@ -119,7 +123,7 @@ int main()
 			localFrequancyArray, INTENSITIES_PER_PROCESSOR, MPI_DOUBLE, MAIN_PROCESSOR, MPI_COMM_WORLD, &request);
 		for (int i = 0; i < INTENSITIES_PER_PROCESSOR; i++)
 			localProbabilites[i] = (double)localFrequancyArray[i] / PIXELS_COUNT;
-		
+
 	}
 	else {
 
@@ -130,7 +134,7 @@ int main()
 		//localProbabilites = calculateColorProbability(localFrequancyArray, PIXELS_COUNT);
 		for (int i = 0; i < INTENSITIES_PER_PROCESSOR; i++)
 			localProbabilites[i] = (double)localFrequancyArray[i] / PIXELS_COUNT;
-		
+
 
 	}
 	double* totalCumulativeProbabilites = new double[MAX_INTENSITY_VALUE] {};
@@ -144,7 +148,7 @@ int main()
 
 #pragma region Cumulative Probability
 
-	double* cumulativeProbability = new double[MAX_INTENSITY_VALUE];
+	double* cumulativeProbability = new double[PADDED_ARRAY_SIZE];
 	double* colorProbability = {};
 
 	if (isMainProcessor(rank))
@@ -152,22 +156,22 @@ int main()
 		colorProbability = calculateColorProbability(totalFrequancyArray, PIXELS_COUNT);
 	}
 
-	double* localColorProbability = new double[INTENSITIES_PER_PROCESSOR];
+	double* localColorProbability = new double[PADDED_SUBARRAY_SIZE];
 
 
-	MPI_Scatter(colorProbability, INTENSITIES_PER_PROCESSOR, MPI_DOUBLE, localColorProbability, INTENSITIES_PER_PROCESSOR,
+	MPI_Scatter(colorProbability, PADDED_SUBARRAY_SIZE, MPI_DOUBLE, localColorProbability, PADDED_SUBARRAY_SIZE,
 		MPI_DOUBLE, MAIN_PROCESSOR, MPI_COMM_WORLD);
 
-	double *localCumulativeProbability = calculateCumulativeProbability(localColorProbability, INTENSITIES_PER_PROCESSOR);
+	double* localCumulativeProbability = calculateCumulativeProbability(localColorProbability, PADDED_SUBARRAY_SIZE);
 
 	double prevSum = 0;
-	double cumulativeSum = localCumulativeProbability[INTENSITIES_PER_PROCESSOR - 1];
+	double cumulativeSum = localCumulativeProbability[PADDED_SUBARRAY_SIZE - 1];
 
 	MPI_Exscan(&cumulativeSum, &prevSum, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
-	for (int i = 0; i < INTENSITIES_PER_PROCESSOR; i++)localCumulativeProbability[i] += prevSum;
+	for (int i = 0; i < PADDED_SUBARRAY_SIZE; i++)localCumulativeProbability[i] += prevSum;
 
-	MPI_Gather(localCumulativeProbability, INTENSITIES_PER_PROCESSOR, MPI_DOUBLE, cumulativeProbability, INTENSITIES_PER_PROCESSOR,
+	MPI_Gather(localCumulativeProbability, PADDED_SUBARRAY_SIZE, MPI_DOUBLE, cumulativeProbability, PADDED_SUBARRAY_SIZE,
 		MPI_DOUBLE, MAIN_PROCESSOR, MPI_COMM_WORLD);
 
 	if (isMainProcessor(rank) && ENABLE_DEBUG)
@@ -185,11 +189,11 @@ int main()
 	time than just doing it sequentially */
 
 
-	int* localIntensities = putInRangeV(localCumulativeProbability, INTENSITY_RANGE, INTENSITIES_PER_PROCESSOR);
+	int* localIntensities = putInRangeV(localCumulativeProbability, INTENSITY_RANGE, PADDED_SUBARRAY_SIZE);
 
-	int* totalIntensities = new int[MAX_INTENSITY_VALUE];
-	MPI_Gather(localIntensities, INTENSITIES_PER_PROCESSOR, MPI_INT,
-		totalIntensities, INTENSITIES_PER_PROCESSOR, MPI_INT, MAIN_PROCESSOR, MPI_COMM_WORLD);
+	int* totalIntensities = new int[PADDED_ARRAY_SIZE];
+	MPI_Gather(localIntensities, PADDED_SUBARRAY_SIZE, MPI_INT,
+		totalIntensities, PADDED_SUBARRAY_SIZE, MPI_INT, MAIN_PROCESSOR, MPI_COMM_WORLD);
 
 	if (isMainProcessor(rank) && ENABLE_DEBUG)
 		verifyEqualizedIntenisties(totalIntensities);
