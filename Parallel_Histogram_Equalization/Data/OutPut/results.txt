@@ -59,3 +59,6 @@ Size: (720 , 720) , Time : 364ms
 Size: (720 , 720) , Time : 362ms
 Size: (200 , 195) , Time : 261ms
 Size: (200 , 195) , Time : 353ms
+Size: (200 , 195) , Time : 335ms
+Size: (200 , 195) , Time : 413ms
+Size: (200 , 195) , Time : 356ms

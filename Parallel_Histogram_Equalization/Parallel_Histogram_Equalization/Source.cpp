@@ -123,48 +123,38 @@ int main()
 
 
 #pragma region calculate Color probability
+	MPI_Bcast(&ImageHeight, 1, MPI_DOUBLE, MAIN_PROCESSOR, MPI_COMM_WORLD);
+	MPI_Bcast(&ImageWidth, 1, MPI_DOUBLE, MAIN_PROCESSOR, MPI_COMM_WORLD);
 
-	
-	double* localProbabilites = new double[INTENSITIES_PER_PROCESSOR] {};
-	int* localFrequencyArray;
+	double* localProbabilites = new  double[PADDED_SUBARRAY_SIZE] {};
+	int* localFrequencyArray = new  int[PADDED_SUBARRAY_SIZE];
 
-
-	if (WORLD_SIZE == 3) {
-		//will use scatterv cpu1=85,cpu2=85,cpu3=86
-		int count[3] = { 85,85, 86 };
-		int displacement[3] = { 0,85,170 };
-		MPI_Request request;
-		MPI_Iscatterv(totalFrequancyArray, count, displacement, MPI_INT,
-			localFrequancyArray, INTENSITIES_PER_PROCESSOR, MPI_DOUBLE, MAIN_PROCESSOR, MPI_COMM_WORLD, &request);
-		for (int i = 0; i < INTENSITIES_PER_PROCESSOR; i++)
-			localProbabilites[i] = (double)localFrequancyArray[i] / PIXELS_COUNT;
-
-	}
-	else {
+	MPI_Scatter(totalFrequancyArray, PADDED_SUBARRAY_SIZE, MPI_INT,
+		localFrequancyArray, PADDED_SUBARRAY_SIZE, MPI_INT, MAIN_PROCESSOR, MPI_COMM_WORLD);
 
 
-		MPI_Scatter(totalFrequancyArray, INTENSITIES_PER_PROCESSOR, MPI_INT,
-			localFrequancyArray, INTENSITIES_PER_PROCESSOR, MPI_DOUBLE, MAIN_PROCESSOR, MPI_COMM_WORLD);
-
-		//localProbabilites = calculateColorProbability(localFrequancyArray, PIXELS_COUNT);
-		for (int i = 0; i < INTENSITIES_PER_PROCESSOR; i++)
-			localProbabilites[i] = (double)localFrequancyArray[i] / PIXELS_COUNT;
+	for (int i = 0; i < PADDED_SUBARRAY_SIZE; i++)
+		localProbabilites[i] = (double)(localFrequancyArray[i] / ((double)ImageHeight * ImageWidth));
 
 
-	}
-	double* totalCumulativeProbabilites = new double[MAX_INTENSITY_VALUE] {};
 
-	MPI_Gather(localProbabilites, INTENSITIES_PER_PROCESSOR, MPI_INT, totalCumulativeProbabilites,
-		INTENSITIES_PER_PROCESSOR, MPI_DOUBLE, MAIN_PROCESSOR, MPI_COMM_WORLD);
+
+	double* colorProbability = new  double[PADDED_ARRAY_SIZE] {};
+
+	MPI_Gather(localProbabilites, PADDED_SUBARRAY_SIZE, MPI_DOUBLE, colorProbability,
+		PADDED_SUBARRAY_SIZE, MPI_DOUBLE, MAIN_PROCESSOR, MPI_COMM_WORLD);
+	//verify
+	if (isMainProcessor(rank) && ENABLE_DEBUG)
+		verifyColorProbability(colorProbability);
+
 
 
 #pragma endregion
 
-
 #pragma region Cumulative Probability
 
 	double* cumulativeProbability = new double[PADDED_ARRAY_SIZE];
-	double* colorProbability = {};
+	
 
 	if (isMainProcessor(rank))
 	{

@@ -102,11 +102,12 @@ void verifyFrequancyArray(int* frequancy)
 				<< ", Got : " << frequancy[i] << "\n";
 			//cout << "Exiting..!\n";
 			system("pause");
+
 			//exit(-1);
 		}
 	}
 	cout << "Verified!\n\n";
-
+	cout << "sara tmam";
 }
 
 void verifyColorProbability(double* colorProbability)
