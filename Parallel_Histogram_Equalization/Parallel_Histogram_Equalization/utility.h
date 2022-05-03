@@ -107,7 +107,7 @@ void verifyFrequancyArray(int* frequancy)
 		}
 	}
 	cout << "Verified!\n\n";
-	cout << "sara tmam";
+
 }
 
 void verifyColorProbability(double* colorProbability)
