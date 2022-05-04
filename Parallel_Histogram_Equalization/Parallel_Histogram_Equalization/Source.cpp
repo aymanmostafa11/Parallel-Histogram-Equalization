@@ -28,11 +28,11 @@ using namespace msclr::interop;
 bool RUNNING_PARALLEL;
 
 
-#define ENABLE_DEBUG 1
+#define ENABLE_DEBUG 0
 // prints a message from each processor where x -> message (or expression in cout form eg. foo << bar)
-#define debug(x) if(ENABLE_DEBUG) cout << "Rank : " << rank << " " << x << "\n";
+#define debug(x) if(ENABLE_DEBUG) {cout << "Rank : " << rank << " " << x << endl;}
 
-#define debugMainProc(rank, x) if(ENABLE_DEBUG && rank == MAIN_PROCESSOR){ cout << "Rank : " << rank << " " << x << "\n";}
+#define debugMainProc(rank, x) if(ENABLE_DEBUG && rank == MAIN_PROCESSOR){ cout << "Rank : " << rank << " " << x << endl;}
 #define PAUSE(rank) {if (ENABLE_DEBUG && rank == MAIN_PROCESSOR){ char tmp; cin>>tmp;} MPI_Barrier(MPI_COMM_WORLD);}
 
 void cleanUp(int* localFrequancyArray, int* localImage, int* imageData, int* totalFrequancyArray);
@@ -50,7 +50,7 @@ int main()
 	int ImageWidth = 4, ImageHeight = 4;
 	int PIXELS_COUNT = 0;
 	int* imageData = nullptr;
-	int INTENSITY_RANGE = 240;
+	int INTENSITY_RANGE = 250;
 
 
 	if (isMainProcessor(rank))
@@ -58,7 +58,7 @@ int main()
 		System::String^ imagePath;
 		std::string img;
 
-		setTestImageN(1);
+		setTestImageN(10);
 		img = TEST_PATH;
 
 		imagePath = marshal_as<System::String^>(img);
@@ -70,10 +70,15 @@ int main()
 	if (!RUNNING_PARALLEL)
 	{
 		int intenistyRange = 240;
-		sequentialRunAndClock(imageData, ImageWidth, ImageHeight, 0, intenistyRange);
+		sequentialRunAndClock(imageData, ImageWidth, ImageHeight, 0, intenistyRange, WORLD_SIZE);
 		MPI_Finalize();
 		return 0;
 	}
+#pragma region Init
+	int start_s, stop_s, TotalTime = 0;
+	if (isMainProcessor(rank))
+		start_s = clock();
+#pragma endregion
 
 
 	/*When using PIXELS_PER_PROCESSOR note that in case of non divisible pixels count 
@@ -120,7 +125,6 @@ int main()
 	if (isMainProcessor(rank) && ENABLE_DEBUG)
 		verifyFrequancyArray(totalFrequancyArray);
 #pragma endregion
-
 
 #pragma region calculate Color probability
 	MPI_Bcast(&ImageHeight, 1, MPI_DOUBLE, MAIN_PROCESSOR, MPI_COMM_WORLD);
@@ -186,26 +190,56 @@ int main()
 #pragma endregion
 
 #pragma region Equalize Intensities 
-
-	// NOTE: currently doesn't work if number of processors is not a power of 2, shall be fixed soon (fr)
-
-
 	/* This is probably usesless beacuse the overhead of parallelizing an operatation that is applied only 256 times probably takes more
 	time than just doing it sequentially */
 
 
 	int* localIntensities = putInRangeV(localCumulativeProbability, INTENSITY_RANGE, PADDED_SUBARRAY_SIZE);
-
-	int* totalIntensities = new int[PADDED_ARRAY_SIZE];
+	int* totalIntensities = new int[PADDED_ARRAY_SIZE] {};
 	MPI_Gather(localIntensities, PADDED_SUBARRAY_SIZE, MPI_INT,
 		totalIntensities, PADDED_SUBARRAY_SIZE, MPI_INT, MAIN_PROCESSOR, MPI_COMM_WORLD);
-
+	
 	if (isMainProcessor(rank) && ENABLE_DEBUG)
 		verifyEqualizedIntenisties(totalIntensities);
 
 #pragma endregion
 
+#pragma region apply on image
 
+	MPI_Bcast(totalIntensities, PADDED_ARRAY_SIZE, MPI_INT, MAIN_PROCESSOR, MPI_COMM_WORLD);
+
+	if (isMainProcessor(rank))
+		localImage = equalizeImage(localImage, totalIntensities, PIXELS_PER_PROCESSOR);
+	else
+		localImage = equalizeImage(localImage, totalIntensities, PIXELS_PER_PROCESSOR - DIVISION_REMAINDER);
+
+	/* Because main processor operates on different number of pixels in case of non divisble pixels count
+	Gather malfunctions when provided with different number of recv buffer size than the numbers in "counts" */
+	if (isMainProcessor(rank))
+	{
+		for (int i = 0; i < counts[0]; i++)
+			imageData[i] = localImage[i];
+		counts[0] = 0;
+	}
+
+	MPI_Gatherv(localImage, PIXELS_PER_PROCESSOR - DIVISION_REMAINDER, MPI_INT, imageData, counts, displacement, MPI_INT, MAIN_PROCESSOR, MPI_COMM_WORLD);
+	
+	if (isMainProcessor(rank) && ENABLE_DEBUG)
+		verifyFinalImage(imageData, PIXELS_COUNT);
+	
+#pragma endregion
+
+#pragma region Finalize
+	if (isMainProcessor(rank))
+	{
+		stop_s = clock();
+		TotalTime += (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000;
+
+		createImage(imageData, ImageWidth, ImageHeight, 1);
+
+		writeResultsToFile(TotalTime, ImageWidth, ImageHeight, WORLD_SIZE);
+	}
+#pragma endregion
 
 	cleanUp(localFrequancyArray, localImage, imageData, totalFrequancyArray);
 	MPI_Finalize();

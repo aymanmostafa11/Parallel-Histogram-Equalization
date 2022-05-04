@@ -1,64 +1,14 @@
-Size: (2000 , 1956) , Time : 6264ms
-Size: (2000 , 1956) , Time : 5656ms
-Size: (2000 , 1956) , Time : 7205ms
-Size: (2000 , 1956) , Time : 3200ms
-Size: (2000 , 1956) , Time : 8125ms
-Size: (2000 , 1956) , Time : 12376ms
-Size: (200 , 195) , Time : 98ms
-Size: (200 , 195) , Time : 97ms
-Size: (200 , 195) , Time : 80ms
-Size: (200 , 195) , Time : 73ms
-Size: (200 , 195) , Time : 86ms
-Size: (400 , 391) , Time : 245ms
-Size: (2000 , 1956) , Time : 7917ms
-Size: (200 , 195) , Time : 65ms
-Size: (200 , 195) , Time : 40ms
-Size: (200 , 195) , Time : 35ms
-Size: (200 , 195) , Time : 35ms
-Size: (200 , 195) , Time : 46ms
-Size: (200 , 195) , Time : 41ms
-Size: (200 , 195) , Time : 38ms
-Size: (200 , 195) , Time : 80ms
-Size: (200 , 195) , Time : 65ms
-Size: (200 , 195) , Time : 4021ms
-Size: (200 , 195) , Time : 2986ms
-Size: (200 , 195) , Time : 16441ms
-Size: (200 , 195) , Time : 4744ms
-Size: (200 , 195) , Time : 10161ms
-Size: (200 , 195) , Time : 3076ms
-Size: (200 , 195) , Time : 74ms
-Size: (200 , 195) , Time : 78ms
-Size: (200 , 195) , Time : 158ms
-Size: (200 , 195) , Time : 74ms
-Size: (200 , 195) , Time : 80ms
-Size: (200 , 195) , Time : 37059ms
-Size: (200 , 195) , Time : 2428ms
-Size: (200 , 195) , Time : 68ms
-Size: (200 , 195) , Time : 6050ms
-Size: (200 , 195) , Time : 69ms
-Size: (200 , 195) , Time : 78ms
-Size: (200 , 195) , Time : 107ms
-Size: (200 , 195) , Time : 75ms
-Size: (200 , 195) , Time : 49ms
-Size: (200 , 195) , Time : 48ms
-Size: (200 , 195) , Time : 108ms
-Size: (200 , 195) , Time : 75ms
-Size: (200 , 195) , Time : 82ms
-Size: (200 , 195) , Time : 390ms
-Size: (200 , 195) , Time : 129ms
-Size: (200 , 195) , Time : 231ms
-Size: (200 , 195) , Time : 165ms
-Size: (200 , 195) , Time : 123ms
-Size: (200 , 195) , Time : 126ms
-Size: (200 , 195) , Time : 4747ms
-Size: (200 , 195) , Time : 247ms
-Size: (200 , 195) , Time : 124ms
-Size: (200 , 195) , Time : 169ms
-Size: (200 , 195) , Time : 236ms
-Size: (720 , 720) , Time : 364ms
-Size: (720 , 720) , Time : 362ms
-Size: (200 , 195) , Time : 261ms
-Size: (200 , 195) , Time : 353ms
-Size: (200 , 195) , Time : 335ms
-Size: (200 , 195) , Time : 413ms
-Size: (200 , 195) , Time : 356ms
+Size: (200 , 195) , Time : 1ms ,Processor Count : 1
+Size: (200 , 195) , Time : 5ms ,Processor Count : 4
+Size: (200 , 195) , Time : 7ms ,Processor Count : 5
+Size: (200 , 195) , Time : 8ms ,Processor Count : 8
+Size: (400 , 391) , Time : 2ms ,Processor Count : 1
+Size: (400 , 391) , Time : 7ms ,Processor Count : 4
+Size: (400 , 391) , Time : 13ms ,Processor Count : 5
+Size: (400 , 391) , Time : 11ms ,Processor Count : 8
+Size: (2000 , 1956) , Time : 37ms ,Processor Count : 1
+Size: (2000 , 1956) , Time : 39ms ,Processor Count : 4
+Size: (2000 , 1956) , Time : 29ms ,Processor Count : 5
+Size: (2000 , 1956) , Time : 26ms ,Processor Count : 8
+Size: (2000 , 1956) , Time : 31ms ,Processor Count : 5
+Size: (2000 , 1956) , Time : 48ms ,Processor Count : 2

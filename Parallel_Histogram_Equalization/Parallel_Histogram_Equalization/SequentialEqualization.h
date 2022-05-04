@@ -59,7 +59,7 @@ double* calculateCumulativeProbability(double* colorProbability, int size)
 int* putInRange(double* cumulativeProbability, int range)
 {
 	int* equalizedIntenisties = new int[MAX_INTENSITY_VALUE] {};
-	for (int i = 1; i < MAX_INTENSITY_VALUE; i++)
+	for (int i = 0; i < MAX_INTENSITY_VALUE; i++)
 	{
 		equalizedIntenisties[i] = floor(cumulativeProbability[i] * range);
 	}
@@ -100,11 +100,10 @@ int* sequentialEqualization(int* image, int width, int height, int intenistyRang
 	int* equalizedIntenisties = putInRange(cumulativeProbability, intenistyRange);
 
 	int* finalImage = equalizeImage(image, equalizedIntenisties, pixelCount);
-	verifyFinalImage(finalImage, pixelCount);
 	return finalImage;
 }
 
-void sequentialRunAndClock(int* image, int width, int height, int imageIndex, int intenistyRange)
+void sequentialRunAndClock(int* image, int width, int height, int imageIndex, int intenistyRange, int processorCount)
 {
 	int start_s, stop_s, TotalTime = 0;
 
@@ -112,12 +111,12 @@ void sequentialRunAndClock(int* image, int width, int height, int imageIndex, in
 
 	image = sequentialEqualization(image, width, height, intenistyRange);
 
-	createImage(image, width, height, imageIndex);
 
 	stop_s = clock();
 	TotalTime += (stop_s - start_s) / double(CLOCKS_PER_SEC) * 1000;
 
-	writeResultsToFile(TotalTime, width, height);
+	createImage(image, width, height, imageIndex);
+	writeResultsToFile(TotalTime, width, height, processorCount);
 
 	free(image);
 }

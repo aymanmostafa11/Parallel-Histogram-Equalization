@@ -39,7 +39,7 @@ void setTestImageN(int n)
 	}
 }
 
-void writeResultsToFile(int time, int width, int height)
+void writeResultsToFile(int time, int width, int height, int processorCount)
 {
 	ofstream file("..//Data//Output//results.txt", ios::app);
 	file << "Size: (";
@@ -48,7 +48,8 @@ void writeResultsToFile(int time, int width, int height)
 	file << height;
 	file << ") , Time : ";
 	file << time;
-	file << "ms\n";
+	file << "ms ,";
+	file << "Processor Count : " << processorCount << "\n";
 	file.close();
 }
 
@@ -162,6 +163,7 @@ void verifyCumulativeProbability(double* cumulativeProbability)
 
 void verifyEqualizedIntenisties(int* equalizedIntenisties)
 {
+	double EPS = 1.0;
 	cout << "Verifying Equalized Intenisties: \n\n";
 
 	ifstream file("..//Data//Input//equalizedIntenisties.txt");
@@ -172,7 +174,7 @@ void verifyEqualizedIntenisties(int* equalizedIntenisties)
 
 	for (int i = 0; i < MAX_INTENSITY_VALUE; i++)
 	{
-		if (abs(equalizedIntenisties[i] - expected[i]) > 0.0001)
+		if (abs(equalizedIntenisties[i] - expected[i]) > EPS)
 		{
 			cout << "Wrong Value at index " << i << "\nExpected : " << expected[i]
 				<< ", Got : " << equalizedIntenisties[i] << "\n";
@@ -187,6 +189,7 @@ void verifyEqualizedIntenisties(int* equalizedIntenisties)
 
 void verifyFinalImage(int* finalImage, int pixelCount)
 {
+	double EPS = 1.0;
 	cout << "Verifying Final Image: \n\n";
 
 	ifstream file("..//Data//Input//finalImage.txt");
@@ -197,7 +200,7 @@ void verifyFinalImage(int* finalImage, int pixelCount)
 
 	for (int i = 0; i < pixelCount; i++)
 	{
-		if (finalImage[i] != expected[i])
+		if (abs(finalImage[i] - expected[i]) > EPS)
 		{
 			cout << "Wrong Value at index " << i << "\nExpected : " << expected[i]
 				<< ", Got : " << finalImage[i] << "\n";
