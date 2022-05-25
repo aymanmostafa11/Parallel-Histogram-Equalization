@@ -12,3 +12,18 @@ Size: (2000 , 1956) , Time : 29ms ,Processor Count : 5
 Size: (2000 , 1956) , Time : 26ms ,Processor Count : 8
 Size: (2000 , 1956) , Time : 31ms ,Processor Count : 5
 Size: (2000 , 1956) , Time : 48ms ,Processor Count : 2
+Size: (477 , 477) , Time : 6925ms ,Processor Count : 1
+Size: (477 , 477) , Time : 2ms ,Processor Count : 1
+Size: (477 , 477) , Time : 12ms ,Processor Count : 5
+Size: (477 , 477) , Time : 13ms ,Processor Count : 11
+Size: (477 , 477) , Time : 10ms ,Processor Count : 8
+Size: (477 , 477) , Time : 8ms ,Processor Count : 5
+Size: (477 , 477) , Time : 2ms ,Processor Count : 1
+Size: (2385 , 2385) , Time : 51ms ,Processor Count : 4
+Size: (2385 , 2385) , Time : 34ms ,Processor Count : 8
+Size: (2385 , 2385) , Time : 62ms ,Processor Count : 1
+Size: (4770 , 4770) , Time : 96ms ,Processor Count : 8
+Size: (4770 , 4770) , Time : 92ms ,Processor Count : 4
+Size: (4770 , 4770) , Time : 205ms ,Processor Count : 1
+Size: (4770 , 4770) , Time : 186ms ,Processor Count : 4
+Size: (2385 , 2385) , Time : 399ms ,Processor Count : 4 (10 * 5N)
